@@ -1,8 +1,64 @@
 const axios = require("axios");
+const dayjs = require("dayjs");
 
-const getAverageRent = async (statisticalArea, numBedrooms) => {
-    const url = "https://api.business.govt.nz/services/v1/tenancy-services/market-rent/statistics" + 
-        "?period-ending=2021-11&num-months=3&area-definition=TA2019&include-aggregates=true&statistics=med&num-bedrooms=2&area-codes=1";
+const CONSUMER_KEY = process.env.MBIE_CONSUMER_KEY;
+const CONSUMER_SECRET = process.env.MBIE_CONSUMER_SECRET;
+
+const NUM_MONTHS = 3;
+const AREA_DEFINITION = "SAU2019";
+const STATISTICS = "med,lq,uq";
+
+let apiKey = null;
+let apiKeyExpiryMs = null;
+
+const setApiKey = async () => {
+    const bearer = new Buffer.from(`${CONSUMER_KEY}:${CONSUMER_SECRET}`).toString("base64");
+
+    const url = "https://api.business.govt.nz/services/token?grant_type=client_credentials&validity_period=3600";
+    const response = await axios.post(url, null, {
+        headers: {
+            Authorization: `Basic ${bearer}`
+        }
+    });
+    
+    apiKey = response.data;
+    apiKeyExpiryMs = Date.now() + (apiKey.expires_in * 1000);
+}
+
+const getApiKey = async () => {
+    if (apiKey === null) {
+        console.log("No MBIE token currently set. Setting one now...");
+        await setApiKey();
+    }
+
+    if (Date.now() > apiKeyExpiryMs) {
+        console.log("MBIE token has expired. Setting a new one now...");
+        await setApiKey();
+    }
+
+    return apiKey.access_token;
+}
+
+const getRentStatistics = async (statisticalAreaId, numBedrooms) => {
+    const periodEndingDateString = dayjs().subtract(2, "month").format("YYYY-MM");
+    const url = "https://api.business.govt.nz/services/v1/tenancy-services/market-rent/statistics";
+
+    const response = await axios.get(url, {
+        params: {
+            "period-ending": periodEndingDateString,
+            "num-months": NUM_MONTHS,
+            "area-definition": AREA_DEFINITION,
+            "include-aggregates": true,
+            "statistics": STATISTICS,
+            "num-bedrooms": numBedrooms,
+            "area-codes": statisticalAreaId
+        },
+        headers: {
+            Authorization: `Bearer ${await getApiKey()}`
+        }
+    });
+
+    return response.data;
 };
 
-exports.getAverageRent = getAverageRent;
+exports.getRentStatistics = getRentStatistics;
