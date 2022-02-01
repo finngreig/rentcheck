@@ -61,4 +61,20 @@ const getRentStatistics = async (statisticalAreaId, numBedrooms) => {
     return response.data;
 };
 
+const calculateSummaryStatistics = (marketRentResponse, userRent) => {
+    const aggregateStatistics = marketRentResponse.items.find(item => item.dwell === "ALL" && item.area === "ALL");
+
+    return {
+        lq: aggregateStatistics.lq,
+        med: aggregateStatistics.med,
+        uq: aggregateStatistics.uq,
+        diff: {
+            lq: userRent - aggregateStatistics.lq,
+            med: userRent - aggregateStatistics.med,
+            uq: userRent - aggregateStatistics.uq
+        }
+    }
+};
+
 exports.getRentStatistics = getRentStatistics;
+exports.calculateSummaryStatistics = calculateSummaryStatistics;

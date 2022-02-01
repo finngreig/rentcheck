@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+        <link rel="stylesheet" href="main.css">
+        <title>Is The Rent Too Damn High? | The Finn Greig Rent Initiative</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+        <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+    </head>
+    <body>
+        <h1>Is The Rent <i>Too Damn High?</i></h1>
+        <img src="too_damn_high.jpg" alt="Too Damn High meme">
+        <form id="rentForm">
+            <div class="ui-widget">
+                <!-- <label for="address">Address: </label> -->
+                <input id="address" placeholder="Address">
+            </div>
+
+            <div class="ui-widget">
+                <!-- <label for="rent">Rent: $</label> -->
+                <input id="rent" type="number" placeholder="Rent ($)">
+            </div>
+
+            <div class="ui-widget">
+                <!-- <label for="bedrooms">Number of Bedrooms: </label> -->
+                <input id="bedrooms" type="number" placeholder="Number of Bedrooms">
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <div id="results" hidden>
+            <p>Your Rent: <span id="yourRent"></span></p>
+            <p>Area: <span id="yourArea"></span></p>
+            <table>
+                <tr>
+                    <th>Statistic</th>
+                    <th>Value</th>
+                    <th>Difference</th>
+                </tr>
+                <tr>
+                    <td>Upper Quartile</td>
+                    <td id="upperQuartile"></td>
+                    <td id="upperQuartileDiff"></td>
+                </tr>
+                <tr>
+                    <td>Median</td>
+                    <td id="median"></td>
+                    <td id="medianDiff"></td>
+                </tr>
+                <tr>
+                    <td>Lower Quartile</td>
+                    <td id="lowerQuartile"></td>
+                    <td id="lowerQuartileDiff"></td>
+                </tr>
+            </table>
+            <p id="rentAdjustmentMessage" hidden>Your rent is <span id="percentAboveMedian"></span>% above the median value. The Tenancy Tribunal will consider an application for rent adjustment when it's generally >= 10% above the rents of similar properties in your area!</p>
+        </div>
+        
+        <hr>
+        <p>
+            A <a href="https://rentinitiative.finngreig.com">Finn Greig Rent Initiative</a> project
+        </p>
+
+        <script>
+            var pxid = null;
+            $( function() {
+                $("#rentForm")[0].reset();
+                $( "#address" ).autocomplete({
+                    source: "api/address/autocomplete",
+                    minLength: 2,
+                    select: function( event, ui ) {
+                    pxid = ui.item.id;
+                    }
+                });
+
+                function formatDiff(diff) {
+                    if (diff > 0) {
+                        return '<span style="color:red">$+' + diff + '</span>';
+                    } else if (diff < 0) {
+                        return '<span style="color:green">$' + diff + '</span>';
+                    } else {
+                        return '$0';
+                    }
+                }
+
+                function getPercentageDifference(oldNumber, newNumber) {
+                    let increaseValue = newNumber - oldNumber;
+                    return (increaseValue / oldNumber) * 100;
+                }
+
+                $("#rentForm").submit(function(e) {
+                    e.preventDefault();
+                    $.ajax({
+                        url: "api/compareRent",
+                        type: "POST",
+                        data: {
+                            pxid: pxid,
+                            rent: $("#rent").val(),
+                            bedrooms: $("#bedrooms").val()
+                        },
+                        success: function(data) {
+                            $("#yourRent").text("$" + $("#rent").val());
+                            $("#yourArea").text(data.area);
+                            $("#upperQuartile").text("$" + data.uq);
+                            $("#upperQuartileDiff").html(formatDiff(data.diff.uq));
+                            $("#median").text("$" + data.med);
+                            $("#medianDiff").html(formatDiff(data.diff.med));
+                            $("#lowerQuartile").text("$" + data.lq);
+                            $("#lowerQuartileDiff").html(formatDiff(data.diff.lq));
+                            $("#results").show();
+
+                            const rentDifferencePercentage = Math.round((data.diff.med / data.med) * 100);
+                            if (rentDifferencePercentage >= 10) {
+                                $("#percentAboveMedian").text(rentDifferencePercentage);
+                                $("#rentAdjustmentMessage").show();
+                            }
+                        }
+                    });
+                });
+            } );
+        </script>
+    </body>
+</html>

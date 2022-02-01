@@ -1,35 +1,46 @@
 require("dotenv").config();
 
 const express = require("express");
+const morgan = require("morgan");
 const path = require("path");
 
 const app = express();
 
+let morgan_format = "combined";
+if (process.env.ENVIRONMENT === "development") {
+    morgan_format = "dev";
+}
+app.use(morgan(morgan_format));
+
+app.use(express.urlencoded({extended: true}));
+
 const {getAddressAutocomplete, getAddressMetadata} = require("./addressfinder.js");
-const {getRentStatistics} = require("./tenancyservices.js");
+const {getRentStatistics, calculateSummaryStatistics} = require("./tenancyservices.js");
 
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-});
+if (process.env.ENVIRONMENT === "development") {
+    app.use(express.static(path.join(__dirname, "public")));
+}
 
-app.get("/address/autocomplete", async (req, res) => {
+app.get("/api/address/autocomplete", async (req, res) => {
     const address = req.query.term;
     const results = await getAddressAutocomplete(address);
     res.send(results.map(item => ({id: item.pxid, label: item.a, value: item.a})));
 });
 
-app.get("/compareRent", async (req, res) => {
-    const pxid = req.query.pxid;
-    // const rent = req.query.rent;
-    const bedrooms = req.query.bedrooms;
+app.post("/api/compareRent", async (req, res) => {
+    const pxid = req.body.pxid;
+    const rent = parseFloat(req.body.rent);
+    const bedrooms = req.body.bedrooms;
 
     const addressMetadata = await getAddressMetadata(pxid);
     const saId = addressMetadata.sa2_id;
 
     const rentStatistics = await getRentStatistics(saId, bedrooms);
-    const aggregateStatistics = rentStatistics.items.find(item => item.dwell === "ALL" && item.area === "ALL");
 
-    res.json(aggregateStatistics);
+    res.json({
+        area: addressMetadata.sa2,
+        ...calculateSummaryStatistics(rentStatistics, rent)
+    });
 });
 
 module.exports = app;
