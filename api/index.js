@@ -14,11 +14,11 @@ app.use(morgan(morgan_format));
 
 app.use(express.urlencoded({extended: true}));
 
-const {getAddressAutocomplete, getAddressMetadata} = require("./addressfinder.js");
-const {getRentStatistics, calculateSummaryStatistics} = require("./tenancyservices.js");
+const {getAddressAutocomplete, getAddressMetadata} = require("../addressfinder.js");
+const {getRentStatistics, calculateSummaryStatistics} = require("../tenancyservices.js");
 
 if (process.env.ENVIRONMENT === "development") {
-    app.use(express.static(path.join(__dirname, "public")));
+    app.use(express.static(path.join(__dirname, "..", "public")));
 }
 
 app.get("/api/address/autocomplete", async (req, res) => {
