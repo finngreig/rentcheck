@@ -120,6 +120,8 @@
                             if (rentDifferencePercentage >= 10) {
                                 $("#percentAboveMedian").text(rentDifferencePercentage);
                                 $("#rentAdjustmentMessage").show();
+                            } else {
+                                $("#rentAdjustmentMessage").hide();
                             }
                         }
                     });
