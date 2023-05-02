@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
@@ -14,8 +12,8 @@ app.use(morgan(morgan_format));
 
 app.use(express.urlencoded({extended: true}));
 
-const {getAddressAutocomplete, getAddressMetadata} = require("../addressfinder.js");
-const {getRentStatistics, calculateSummaryStatistics} = require("../tenancyservices.js");
+const {getAddressAutocomplete, getAddressMetadata} = require("../external_services/addressfinder.js");
+const {getRentStatistics, calculateSummaryStatistics} = require("../external_services/tenancyservices.js");
 
 if (process.env.ENVIRONMENT === "development") {
     app.use(express.static(path.join(__dirname, "..", "public")));
