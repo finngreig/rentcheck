@@ -113,16 +113,16 @@
                         },
                         success: function(data) {
                             $("#yourRent").text("$" + $("#rent").val());
-                            $("#yourArea").text(data.area);
-                            $("#upperQuartile").text("$" + data.uq);
-                            $("#upperQuartileDiff").html(formatDiff(data.diff.uq));
-                            $("#median").text("$" + data.med);
-                            $("#medianDiff").html(formatDiff(data.diff.med));
-                            $("#lowerQuartile").text("$" + data.lq);
-                            $("#lowerQuartileDiff").html(formatDiff(data.diff.lq));
+                            $("#yourArea").text(data.area ?? "Unknown");
+                            $("#upperQuartile").text("$" + data.uq ?? "???");
+                            $("#upperQuartileDiff").html(formatDiff(data.diff.uq ?? 0));
+                            $("#median").text("$" + data.med ?? "???");
+                            $("#medianDiff").html(formatDiff(data.diff.med ?? 0));
+                            $("#lowerQuartile").text("$" + data.lq ?? "???");
+                            $("#lowerQuartileDiff").html(formatDiff(data.diff.lq ?? 0));
                             $("#results").show();
 
-                            const rentDifferencePercentage = Math.round((data.diff.med / data.med) * 100);
+                            const rentDifferencePercentage = Math.round((data.diff.med ?? 0 / data.med ?? 1) * 100);
                             if (rentDifferencePercentage >= 10) {
                                 $("#percentAboveMedian").text(rentDifferencePercentage);
                                 $("#rentAdjustmentMessage").show();
