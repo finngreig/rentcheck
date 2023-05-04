@@ -62,7 +62,11 @@
                             </tr>
                         </tbody>
                     </table>
-                    <p id="rentAdjustmentMessage" hidden class="mt-4 bg-red-200 p-4 rounded-lg">Your rent is <span id="percentAboveMedian" class="font-bold"></span>% above the median value. The Tenancy Tribunal will consider an application for rent adjustment when it's generally >= 10% above the rents of similar properties in your area!</p>
+                    <p id="rentAdjustmentMessage" hidden class="mt-4 bg-red-200 p-4 rounded-lg">Your rent is significantly above the upper quartile value. The Tenancy Tribunal will consider an application for rent adjustment when your rent is an outlier compared to the rents of similar properties in your area!</p>
+                </div>
+
+                <div id="error" hidden class="mb-8">
+                    <p class="mt-4 bg-red-200 p-4 rounded-lg">The rent data for your area could not be found. This often happens when Tenancy Services doesn't have enough data to calculate accurate statistics for your area.</p>
                 </div>
                 
                 <hr class="border-gray-300 my-4">
@@ -100,6 +104,10 @@
 
                 $("#rentForm").submit(function(e) {
                     e.preventDefault();
+
+                    $("#error").hide();
+                    $("#results").hide();
+                    
                     $("#submit")
                         .prop("disabled", true)
                         .text("Loading...");
@@ -120,19 +128,26 @@
                             $("#medianDiff").html(formatDiff(data.diff.med ?? 0));
                             $("#lowerQuartile").text("$" + data.lq ?? "???");
                             $("#lowerQuartileDiff").html(formatDiff(data.diff.lq ?? 0));
-                            $("#results").show();
 
-                            const rentDifferencePercentage = Math.round((data.diff.med ?? 0 / data.med ?? 1) * 100);
-                            if (rentDifferencePercentage >= 10) {
-                                $("#percentAboveMedian").text(rentDifferencePercentage);
+                            if (data.diff.iqrAboveUq >= 1.5) {
                                 $("#rentAdjustmentMessage").show();
                             } else {
                                 $("#rentAdjustmentMessage").hide();
                             }
 
+                            $("#results").show();
+
                             $("#submit")
                                 .prop("disabled", false)
                                 .text("Submit");
+                        },
+                        error: function(xhr) {
+                            if (xhr.status === 404) {
+                                $("#error").show();
+                                $("#submit")
+                                    .prop("disabled", false)
+                                    .text("Submit");
+                            }
                         }
                     });
                 });
