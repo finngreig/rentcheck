@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
@@ -14,8 +12,8 @@ app.use(morgan(morgan_format));
 
 app.use(express.urlencoded({extended: true}));
 
-const {getAddressAutocomplete, getAddressMetadata} = require("../addressfinder.js");
-const {getRentStatistics, calculateSummaryStatistics} = require("../tenancyservices.js");
+const {getAddressAutocomplete, getAddressMetadata} = require("../external_services/addressfinder.js");
+const {getRentStatistics, calculateSummaryStatistics, NotFoundError} = require("../external_services/tenancyservices.js");
 
 if (process.env.ENVIRONMENT === "development") {
     app.use(express.static(path.join(__dirname, "..", "public")));
@@ -37,10 +35,18 @@ app.post("/api/compareRent", async (req, res) => {
 
     const rentStatistics = await getRentStatistics(saId, bedrooms);
 
-    res.json({
-        area: addressMetadata.sa2,
-        ...calculateSummaryStatistics(rentStatistics, rent)
-    });
+    try {
+        res.json({
+            area: addressMetadata.sa2,
+            ...calculateSummaryStatistics(rentStatistics, rent)
+        });
+    } catch (err) {
+        if (err instanceof NotFoundError) {
+            res.sendStatus(404);
+        } else {
+            throw err;
+        }
+    }
 });
 
 module.exports = app;

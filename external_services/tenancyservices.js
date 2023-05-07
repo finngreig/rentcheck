@@ -11,6 +11,13 @@ const STATISTICS = "med,lq,uq";
 let apiKey = null;
 let apiKeyExpiryMs = null;
 
+class NotFoundError extends Error {
+    constructor (message) {
+        super(message);
+        this.name = "NotFoundError";
+    }
+}
+
 const setApiKey = async () => {
     const bearer = new Buffer.from(`${CONSUMER_KEY}:${CONSUMER_SECRET}`).toString("base64");
 
@@ -64,17 +71,22 @@ const getRentStatistics = async (statisticalAreaId, numBedrooms) => {
 const calculateSummaryStatistics = (marketRentResponse, userRent) => {
     const aggregateStatistics = marketRentResponse.items.find(item => item.dwell === "ALL" && item.area === "ALL");
 
+    if (aggregateStatistics === undefined) throw new NotFoundError("Could not find any statistics for this address");
+
     return {
         lq: aggregateStatistics.lq,
         med: aggregateStatistics.med,
         uq: aggregateStatistics.uq,
+        iqr: aggregateStatistics.uq - aggregateStatistics.lq,
         diff: {
             lq: userRent - aggregateStatistics.lq,
             med: userRent - aggregateStatistics.med,
-            uq: userRent - aggregateStatistics.uq
+            uq: userRent - aggregateStatistics.uq,
+            iqrAboveUq: parseFloat(((userRent - aggregateStatistics.uq) / (aggregateStatistics.uq - aggregateStatistics.lq)).toFixed(2))
         }
     }
 };
 
 exports.getRentStatistics = getRentStatistics;
 exports.calculateSummaryStatistics = calculateSummaryStatistics;
+exports.NotFoundError = NotFoundError;
