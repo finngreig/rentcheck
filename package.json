@@ -4,7 +4,8 @@
   "description": "",
   "main": "bin/www",
   "scripts": {
-    "start": "./bin/www"
+    "start": "./bin/www",
+    "start-win": "node bin\\www"
   },
   "author": "Finn Greig",
   "dependencies": {

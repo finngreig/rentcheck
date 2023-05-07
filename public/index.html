@@ -12,8 +12,17 @@
     <body class="bg-gray-100 font-sans">
         <div class="container mx-auto px-4 py-8">
             <div class="bg-white rounded-lg shadow-lg p-8 mx-auto w-full md:w-1/2 lg:w-1/2">
-                <h1 class="text-4xl font-bold mb-4 text-center">Is The Rent <i class="italic">Too Damn High?</i></h1>
-                <img src="too_damn_high.jpg" alt="Too Damn High meme" class="w-full md:w-1/2 max-w-md mx-auto mb-4">
+                <h1 class="text-4xl font-bold mb-4 text-center">Rent Check NZ</h1>
+                <img src="too_damn_high.png" alt="The Rent Is Too Damn High meme" class="w-full md:w-1/2 max-w-md mx-auto mb-4">
+                <div class="bg-blue-100 border-t-4 border-blue-500 rounded-b text-blue-900 px-4 py-3 mb-4 shadow-md" role="note">
+                    <div class="flex">
+                        <div class="py-1"><svg class="fill-current h-6 w-6 text-blue-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/></svg></div>
+                        <div>
+                            <p class="font-bold">How it works</p>
+                            <p class="text-sm">To start, enter the address, rent and bedroom count of the property you're at or want to move to. This tool will then compare the property to Tenancy Service's statistics, which are derived from bond lodgement data.</p>
+                        </div>
+                    </div>
+                </div>
                 <form id="rentForm" class="mb-8">
                     <div class="ui-widget mb-4">
                         <label for="address" class="block text-gray-700 font-semibold mb-2">Address</label>
@@ -62,7 +71,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <p id="rentAdjustmentMessage" hidden class="mt-4 bg-red-200 p-4 rounded-lg">Your rent is significantly above the upper quartile value. The Tenancy Tribunal will consider an application for rent adjustment when your rent is an outlier compared to the rents of similar properties in your area!</p>
+                    <p id="rentAdjustmentMessage" hidden class="mt-4 bg-red-200 p-4 rounded-lg">Your rent is significantly above the upper quartile value, which makes it an outlier. The Tenancy Tribunal will consider an application for rent adjustment when your rent is an outlier compared to the rents of similar properties in your area!</p>
                 </div>
 
                 <div id="error" hidden class="mb-8">
