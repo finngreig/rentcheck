@@ -1,4 +1,4 @@
-# Is The Rent Too Damn High?
+# Rent Check NZ
 
 This project is a web application that helps users determine if their rent is too high compared to similar properties in their area. The app uses data from New Zealand's Ministry of Business, Innovation and Employment (MBIE) Tenancy Services and Addressfinder API to look up residential addresses.
 
@@ -41,10 +41,11 @@ Follow these instructions to set up the project on your local machine for develo
    npm install
    ```
 
-3. Create a `.env` file in the root directory and add your API keys for MBIE Tenancy Services and Addressfinder:
+3. Create a `.env` file in the root directory and add your API keys for MBIE Tenancy Services:
    ```
-   MBIE_API_KEY=your_mbie_api_key
-   ADDRESSFINDER_API_KEY=your_addressfinder_api_key
+   ENVIRONMENT=development
+   MBIE_CONSUMER_KEY=your_mbie_consumer_key
+   MBIE_CONSUMER_SECRET=your_mbie_consumer_secret
    ```
 
 4. Start the development server:
@@ -63,7 +64,7 @@ Users enter their residential address, monthly rent, and the number of bedrooms 
 This project is deployed on [Vercel](https://vercel.com). To deploy your own instance, follow these steps:
 
 1. Create a new project on Vercel and link it to your GitHub repository
-2. Add the `MBIE_API_KEY` and `ADDRESSFINDER_API_KEY` environment variables in your Vercel project settings
+2. Add the `MBIE_CONSUMER_KEY` and `MBIE_CONSUMER_SECRET` environment variables in your Vercel project settings
 3. Trigger a deployment by pushing your changes to GitHub
 
 ## Built With
