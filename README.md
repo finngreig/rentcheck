@@ -1,4 +1,5 @@
-# Rent Check NZ
+# 🏘️ Rent Check NZ
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/B0B5L2WE9)
 
 This project is a web application that helps users determine if their rent is too high compared to similar properties in their area. The app uses data from New Zealand's Ministry of Business, Innovation and Employment (MBIE) Tenancy Services and Addressfinder API to look up residential addresses.
 
